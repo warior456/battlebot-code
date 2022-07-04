@@ -1,23 +1,31 @@
+# import serial
 from tkinter import *
-import serial
+from tkinter import ttk
 import time
 
 root = Tk()
+root.title('controller gui')
 root.geometry("550x300")  # widthxheight
 frame = ttk.Frame(root, padding=10)
 frame.grid()
-arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
+# arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
 
-speedvar = 1
+
+speed_var = "1"
+speed_msg = "speed: "
+speed_msg += speed_var
+
 
 
 def write(x):
-    arduino.write(bytes(x, 'utf-8'))
+    # arduino.write(bytes(x, 'utf-8'))
+    print(x)
     return
 
 
 def read():
-    data = arduino.readline().decode('utf-8').rstrip()
+    # data = arduino.readline().decode('utf-8').rstrip()
+    data = "placeholder"
     return data
 
 
@@ -50,45 +58,54 @@ def right():
 
 
 def ping():
-
     ping = "ping["
     ping += ping_val.get()
     ping += "]"
     write(ping)
     pong = read()
-    pingButton.config(text= "pong")
-
+    ping_resp.config(text=pong)
     return
 
 
-def speed(speedvar):
+def speed():
+    global  speed_msg
+    speed_msg = "speed: "
+    speed_msg += speed_var
+    speed_scale.config(label= speed_msg)
+
     return
 
 
 # buttons
-
-ttk.Button(frame, text="forwards", command=forward).grid(column=5, row=0)
-ttk.Button(frame, text="backwards", command=backward).grid(column=5, row=3)
-ttk.Button(frame, text="left", command=left).grid(column=4, row=2)
-ttk.Button(frame, text="right", command=right).grid(column=6, row=2)
-global pingButton
-pingButton = ttk.Button(frame, text="ok", command=lambda: ping(pingLabel)).grid(column=1, row=4)
+ttk.Button(frame, text="forwards", command=forward).grid(column=1, row=0)
+ttk.Button(frame, text="backwards", command=backward).grid(column=1, row=2)
+ttk.Button(frame, text="left", command=left).grid(column=0, row=1)
+ttk.Button(frame, text="right", command=right).grid(column=2, row=1)
+ttk.Button(frame, text="ok", command=ping).grid(column=1, row=4)
 
 # labels
-ttk.Label(frame, text="ping").grid(column=0, row=3)
-pingLabel = ttk.Label(frame, text="not yet pinged").grid(column=0, row=5)
-ttk.Label(frame, text="speed").grid(column=0, row=0)
-speedLabel = ttk.Label(frame, text=speedvar).grid(column=0, row=2)
+ping_label = Label(frame, text="ping")
+ping_label.grid(column=0, row=3)
+
+ping_resp = Label(frame, text="not yet pinged")
+ping_resp.grid(column=0, row=5)
+
+
 
 # sliders
-# ttk.Scale(frame, length= 100, variable = speedvar).grid(column=0, row=1)
+
+speed_scale = Scale(frame, length=100,label=speed_msg, orient=HORIZONTAL)
+speed_scale.grid(column=5, row=6)
+speed_scale.set(speed_var)
+print(speed_scale.get())
 
 ping_val = StringVar()
-ttk.Entry(frame, textvariable=ping_val).grid(column=0, row=4)
+ping_entry = Entry(frame, textvariable=ping_val)
+ping_entry.grid(column=0, row=4)
 
-ttk.Button(frame, text="Quit", command=root.destroy).grid(column=5, row=10)
-
+speed()
 root.mainloop()
-# print(speedvar)
+
+# print(speed_var)
 # print(pa.forwards + pa.backwards + pa.left + pa.right)
-# speedLabel.configure(text= speedvar)
+# speedLabel.configure(text= speed_var)
