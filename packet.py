@@ -1,13 +1,43 @@
 import serial
 import time
-class Packet:
-    def __init__(self, forwards, backards, left, right):
-        self.forwards = forwards
-        self.backwards = backards
-        self.left = left
-        self.right = right
 
-    def send(self):
-        arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=.1)
-        arduino.write(bytes(self, 'utf-8'))
-        print(arduino.readline().decode('utf-8').rstrip())
+arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
+
+
+# vooruit, achteruit, links, rechts, speed
+def send_packet(keyList):
+    packet_data = true_false(keyList['z'])
+    packet_data += ","
+    packet_data += true_false(keyList['s'])
+    packet_data += ","
+    packet_data += true_false(keyList['q'])
+    packet_data += ","
+    packet_data += true_false(keyList['d'])
+    packet_data += ","
+    packet_data += true_false(keyList['speed'])
+    return send_raw(packet_data)
+
+def send_raw(packet_data):
+    print(packet_data)
+    write(packet_data)
+    return read()
+
+def true_false(x):
+    if x == False:
+        x = 0
+    if x == True:
+        x = 1
+    return str(x)
+
+
+def write(x):
+    arduino.write(bytes(x, 'utf-8'))
+
+    return
+
+
+
+def read():
+    data = arduino.readline().decode('utf-8').rstrip()
+    # data = "placeholder"
+    return data
