@@ -1,111 +1,145 @@
-# import serial
+import serial
 from tkinter import *
 from tkinter import ttk
 import time
+from copy import deepcopy
 
 root = Tk()
 root.title('controller gui')
+
 root.geometry("550x300")  # widthxheight
+root.resizable(width=False, height=False)
 frame = ttk.Frame(root, padding=10)
 frame.grid()
-# arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
-
+arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
 
 speed_var = "1"
 speed_msg = "speed: "
 speed_msg += speed_var
 
+keyDown = False
+lastKey = "none"
+keyList = {'z': False, 's': False, 'q': False, 'd': False, 'speed': speed_var}  #vooruit, achteruit, links, rechts, speed
+keyChange = ""
+
+
+def onKeyDown(event):
+    global keyDown, lastKey, keyList
+    if event.char in keyList and keyList[event.char] != True:
+        keyList[event.char] = True
+    keyDown = True
+    lastKey = event.char
+
+
+def onKeyUp(event):
+    global keyDown
+    if event.char in keyList and keyList[event.char] == True:
+        keyList[event.char] = False
+    if len(keyList) == 0:
+        keyDown = False
+
+
+def onTimer():
+    global keyList, keyChange, timerhandle
+
+    if keyChange != keyList:
+        keyChange = deepcopy(keyList)
+    print(str(keyList))
+
+    print(read())
+    timerhandle = root.after(800, onTimer)
 
 
 def write(x):
-    # arduino.write(bytes(x, 'utf-8'))
-    print(x)
+    arduino.write(bytes(x, 'utf-8'))
     return
 
 
 def read():
-    # data = arduino.readline().decode('utf-8').rstrip()
-    data = "placeholder"
+    data = arduino.readline().decode('utf-8').rstrip()
+    # data = "placeholder"
     return data
 
 
-def forward():
-    write("forward")
-    time.sleep(0.15)
-    print(read() + '\n' + read())
-    return
+# def forward(keyList):
+#     write(keyList)
+#     time.sleep(0.15)
+#     print(read() + read())
+#     return
+#
+#
+# def backward(keyList):
+#     write(keyList)
+#     time.sleep(0.15)
+#     print(read() + read())
+#     return
+#
+#
+# def left(keyList):
+#     write(keyList)
+#     time.sleep(0.15)
+#     print(read() + read())
+#     return
+#
+#
+# def right(keyList):
+#     keyList['d'] = True
+#     write(keyList)
+#     time.sleep(0.15)
+#     print(read() + read())
+#     return
 
 
-def backward():
-    write("backwards")
-    time.sleep(0.15)
-    print(read() + '\n' + read())
-    return
-
-
-def left():
-    write("left")
-    time.sleep(0.15)
-    print(read() + '\n' + read())
-    return
-
-
-def right():
-    write("right")
-    time.sleep(0.15)
-    print(read() + '\n' + read())
-    return
-
-
-def ping():
-    ping = "ping["
-    ping += ping_val.get()
-    ping += "]"
+def send_command():
+    ping = ping_val.get()
     write(ping)
+    time.sleep(0.20)
     pong = read()
     ping_resp.config(text=pong)
     return
 
 
-def speed():
-    global  speed_msg
+def speed(speed_var):
+    global speed_msg
     speed_msg = "speed: "
     speed_msg += speed_var
-    speed_scale.config(label= speed_msg)
+    speed_label.config(text=speed_msg)
 
     return
 
 
 # buttons
-ttk.Button(frame, text="forwards", command=forward).grid(column=1, row=0)
-ttk.Button(frame, text="backwards", command=backward).grid(column=1, row=2)
-ttk.Button(frame, text="left", command=left).grid(column=0, row=1)
-ttk.Button(frame, text="right", command=right).grid(column=2, row=1)
-ttk.Button(frame, text="ok", command=ping).grid(column=1, row=4)
+# ttk.Button(frame, text="forwards", command=forward).grid(column=1, row=0)
+# ttk.Button(frame, text="backwards", command=backward).grid(column=1, row=2)
+# ttk.Button(frame, text="left", command=left).grid(column=0, row=1)
+# ttk.Button(frame, text="right", command=right).grid(column=2, row=1)
+ttk.Button(frame, text="ok", command=send_command).grid(column=4, row=1)
 
 # labels
-ping_label = Label(frame, text="ping")
-ping_label.grid(column=0, row=3)
+ping_label = Label(frame, text="Send a command")
+ping_label.grid(column=3, row=0)
+ping_resp = Label(frame, text="No commands sent yet")
+ping_resp.grid(column=3, row=2)
 
-ping_resp = Label(frame, text="not yet pinged")
-ping_resp.grid(column=0, row=5)
-
-
+speed_label = Label(frame, text=speed)
+speed_label.grid(column=0, row=3)
 
 # sliders
-
-speed_scale = Scale(frame, length=100,label=speed_msg, orient=HORIZONTAL)
-speed_scale.grid(column=5, row=6)
+speed_scale = Scale(frame, length=100, orient=VERTICAL, command=speed)
+speed_scale.grid(column=0, row=4)
 speed_scale.set(speed_var)
-print(speed_scale.get())
 
+#
 ping_val = StringVar()
 ping_entry = Entry(frame, textvariable=ping_val)
-ping_entry.grid(column=0, row=4)
+ping_entry.grid(column=3, row=1)
 
-speed()
+# keybinds
+root.bind("<KeyPress>", onKeyDown)
+root.bind("<KeyRelease>", onKeyUp)
+# timerhandle = root.after(800,onTimer)
+
 root.mainloop()
 
-# print(speed_var)
 # print(pa.forwards + pa.backwards + pa.left + pa.right)
 # speedLabel.configure(text= speed_var)
