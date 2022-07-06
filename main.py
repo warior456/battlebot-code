@@ -22,7 +22,6 @@ lastKey = "none"
 keyList = {'z': False, 's': False, 'q': False, 'd': False, 'speed': speed_var}  #vooruit, achteruit, links, rechts, speed
 keyChange = ""
 
-button_time = 0.5
 
 def onKeyDown(event):
     global keyDown, lastKey, keyList
@@ -41,13 +40,19 @@ def onKeyUp(event):
 
 
 def onTimer():
-    global keyList, keyChange, timerhandle
+    global keyList, keyChange, timerhandle, resend_var
 
     if keyChange != keyList:
         keyChange = deepcopy(keyList)
+        resend_var = 2
     # print(keyList['speed'])
     # print(speed_var)
     packet.send_packet(keyList)
+    # if resend_var >= 1:
+    #
+    #     print(resend_var)
+    #     resend_var -= 1
+    #     print(resend_var)
 
     timerhandle = root.after(250, onTimer)
 
@@ -111,7 +116,7 @@ speed_label = Label(frame, text="speed: ")
 speed_label.grid(column=0, row=3)
 
 # sliders
-speed_scale = Scale(frame, length=100, orient=VERTICAL, command=speed, from_=80, to=255)
+speed_scale = Scale(frame, length=100, orient=VERTICAL, command=speed, from_=50, to=255)
 speed_scale.grid(column=0, row=4)
 speed_scale.set(speed_var)
 

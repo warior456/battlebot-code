@@ -1,7 +1,7 @@
 import serial
 import time
 
-arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=.1)
 
 
 # vooruit, achteruit, links, rechts, speed
@@ -29,13 +29,10 @@ def true_false(x):
         x = 1
     return str(x)
 
-
 def write(x):
     arduino.write(bytes(x, 'utf-8'))
 
     return
-
-
 
 def read():
     data = arduino.readline().decode('utf-8').rstrip()
