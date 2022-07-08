@@ -1,7 +1,5 @@
-import serial
 from tkinter import *
 from tkinter import ttk
-import time
 import packet
 from copy import deepcopy
 
@@ -19,11 +17,13 @@ speed_msg += speed_var
 
 keyDown = False
 lastKey = "none"
-keyList = {'z': False, 's': False, 'q': False, 'd': False, 'speed': speed_var}  #vooruit, achteruit, links, rechts, speed
+keyList = {'z': False, 's': False, 'q': False, 'd': False,
+           'speed': speed_var}  # vooruit, achteruit, links, rechts, speed
 keyChange = ""
 
 packet_delay = 250
 off = False
+
 
 def onKeyDown(event):
     global keyDown, lastKey, keyList
@@ -49,7 +49,8 @@ def onTimer():
             resend_var = 2
         packet.send_packet(keyList)
 
-    timerhandle = root.after(packet_delay , onTimer)
+    timerhandle = root.after(packet_delay, onTimer)
+
 
 def send_command():
     ping = command_val.get()
@@ -62,6 +63,7 @@ def send_command():
     command_entry.config(state=NORMAL)
     command_send_btn.config(state=NORMAL)
     return
+
 
 def on_off():
     global off
@@ -76,20 +78,23 @@ def on_off():
         command_send_btn.config(state=NORMAL)
         off = True
 
+
 def motor_speed(speed_var):
     speed_msg = "motor speed: "
     keyList['speed'] = speed_var
     speed_msg += speed_var
     motor_speed_label.config(text=speed_msg)
 
+
 def packet_speed(delay):
-    global  packet_delay
+    global packet_delay
     packet_delay = delay
     packet_speed_label.config(text='packet delay: ' + packet_delay + 'ms')
     return
 
+
 # buttons
-on_off_btn = Button(frame, text="turn control packets off", command= on_off)
+on_off_btn = Button(frame, text="turn control packets off", command=on_off)
 on_off_btn.grid(column=2, row=1)
 command_send_btn = Button(frame, text="ok", command=send_command, state=DISABLED)
 command_send_btn.grid(column=1, row=1)
@@ -114,7 +119,7 @@ motor_speed_scale = Scale(frame, length=100, orient=VERTICAL, command=motor_spee
 motor_speed_scale.grid(column=0, row=4)
 motor_speed_scale.set(speed_var)
 
-#text
+# text
 command_val = StringVar()
 command_entry = Entry(frame, textvariable=command_val, state=DISABLED)
 command_entry.grid(column=0, row=1)
@@ -122,10 +127,6 @@ command_entry.grid(column=0, row=1)
 # keybinds
 root.bind("<KeyPress>", onKeyDown)
 root.bind("<KeyRelease>", onKeyUp)
-timerhandle = root.after(packet_delay ,onTimer)
-
+timerhandle = root.after(packet_delay, onTimer)
 
 root.mainloop()
-
-# print(pa.forwards + pa.backwards + pa.left + pa.right)
-# speedLabel.configure(text= speed_var)

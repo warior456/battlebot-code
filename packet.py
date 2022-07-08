@@ -1,9 +1,7 @@
 import serial
 import time
-import asyncio
 
 arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=.1)
-
 
 # vooruit, achteruit, links, rechts, speed
 def send_packet(keyList):
@@ -18,8 +16,9 @@ def send_packet(keyList):
 def send_raw(packet_data):
     print(packet_data)
     write(packet_data)
-    #read()
+    # read()
     return read()
+
 
 def send_command(packet_data):
     print(packet_data)
@@ -30,6 +29,7 @@ def send_command(packet_data):
     read()
     time.sleep(0.25)
     return read()
+
 
 def true_false(x):
     if x == False:
