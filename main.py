@@ -22,7 +22,7 @@ lastKey = "none"
 keyList = {'z': False, 's': False, 'q': False, 'd': False, 'speed': speed_var}  #vooruit, achteruit, links, rechts, speed
 keyChange = ""
 
-packet_delay = 240
+packet_delay = 250
 off = False
 
 def onKeyDown(event):
